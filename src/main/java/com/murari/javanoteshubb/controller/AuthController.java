@@ -28,7 +28,7 @@ public class AuthController {
 
         // Default Role "STUDENT" rahega. Pehla user banate waqt aap manually DB me "ADMIN" kar sakte ho.
         // Admin email check
-        if (user.getEmail() != null && user.getEmail().equalsIgnoreCase("pandeymurari768@gmail.com")) {
+        if (user.getEmail() != null && user.getEmail().equalsIgnoreCase("pandeymurari571@gmail.com")) {
             user.setRole("ADMIN");
         } else if (user.getRole() == null || user.getRole().isEmpty()) {
             user.setRole("STUDENT");
@@ -60,6 +60,6 @@ public class AuthController {
             }
         }
 
-        return ResponseEntity.status(401).body("Galat Email ya Password!");
+        return ResponseEntity.status(401).body("Wrong Please try again!");
     }
 }
