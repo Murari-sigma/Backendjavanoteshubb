@@ -7,9 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/auth")
@@ -61,5 +64,80 @@ public class AuthController {
         }
 
         return ResponseEntity.status(401).body("Wrong Please try again!");
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String,String> request) {
+
+        String email = request.get("email");
+
+        Optional<User> userOptional = userRepository.findByEmail(email);
+
+        if(userOptional.isEmpty()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("Email registered nahi hai!");
+        }
+
+        User user = userOptional.get();
+
+        String token = UUID.randomUUID().toString();
+
+        user.setResetToken(token);
+        user.setTokenExpiry(LocalDateTime.now().plusMinutes(15));
+
+        userRepository.save(user);
+
+
+        Map<String,String> response = new HashMap<>();
+
+        response.put(
+                "message",
+                "Reset token generated successfully!"
+        );
+
+        response.put(
+                "token",
+                token
+        );
+
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String,String> request) {
+
+        String token = request.get("token");
+        String newPassword = request.get("password");
+
+        Optional<User> userOptional = userRepository.findByResetToken(token);
+
+        if(userOptional.isEmpty()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("Invalid reset token!");
+        }
+
+        User user = userOptional.get();
+
+        if(user.getTokenExpiry().isBefore(LocalDateTime.now())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("Reset token expired!");
+        }
+
+
+        user.setPassword(newPassword);
+
+        user.setResetToken(null);
+        user.setTokenExpiry(null);
+
+        userRepository.save(user);
+
+
+        return ResponseEntity.ok(
+                Map.of("message","Password updated successfully!")
+        );
     }
 }

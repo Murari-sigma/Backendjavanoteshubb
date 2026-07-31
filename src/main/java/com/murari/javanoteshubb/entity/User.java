@@ -3,6 +3,8 @@ package com.murari.javanoteshubb.entity;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "users")
 public class User {
@@ -21,6 +23,10 @@ public class User {
 
     private String role; // "ADMIN" ya "STUDENT"
 
+    private String resetToken;
+
+    private LocalDateTime tokenExpiry;
+
     public User() {}
 
     public User(String name, String email, String password, String role) {
@@ -28,6 +34,22 @@ public class User {
         this.email = email;
         this.password = password;
         this.role = role;
+    }
+
+    public String getResetToken() {
+        return resetToken;
+    }
+
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
+    }
+
+    public LocalDateTime getTokenExpiry() {
+        return tokenExpiry;
+    }
+
+    public void setTokenExpiry(LocalDateTime tokenExpiry) {
+        this.tokenExpiry = tokenExpiry;
     }
 
     // Getters and Setters
